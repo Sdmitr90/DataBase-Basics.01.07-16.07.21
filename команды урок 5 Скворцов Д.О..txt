@@ -1,0 +1,57 @@
+		Найти потоки, количество учеников в которых больше или равно 40. В отчёт вывести номер потока, название курса и количество учеников.
+select
+   (select number from training_groups where students_amount > 40 or students_amount = 40) as number,
+   (select students_amount from training_groups where students_amount > 40  or students_amount = 40) as students_amount,
+   (select name from courses where courses.id =
+      (select course_id from training_groups where training_groups.course_id = courses.id )) as name;
+
+number|students_amount|name
+210|41|Базы данных
+
+
+
+		Найти два потока с самыми низкими оценками за успеваемость. В отчёт вывести номер потока, название курса, фамилию и имя преподавателя (одним столбцом), оценку успеваемости.
+
+select
+   (select number from training_groups where training_groups.id = academic_performance.stream_id) as number,
+   (select name from courses where courses.id =
+   (select course_id from training_groups where training_groups.id = academic_performance.stream_id)) as course_name,
+   (select surname || name from teachers where teachers.id = academic_performance.teacher_id) as name,
+   performance from academic_performance
+order by performance asc limit 2;
+
+number      course_name             name           performance
+----------  ----------------------  -------------  -----------
+165         Linux. Рабочая станция  МалышеваЕлена  4.7
+203         Базы данных             СавельевНикол  4.8
+
+
+
+		Найти среднюю успеваемость всех потоков преподавателя Николая Савельева. В отчёт вывести идентификатор преподавателя и среднюю оценку по потокам.
+
+select
+   teacher_id,
+   AVG(avg_performance)
+from
+   (select teacher_id, AVG(performance) as avg_performance
+   from academic_performance where teacher_id = 1
+   group by teacher_id);
+
+teacher_id  AVG(avg_performance)
+----------  --------------------
+1           4.85
+
+
+
+		Найти потоки преподавателя Натальи Петровой а также потоки, по которым успеваемость ниже 4.8. В отчёт вывести идентификатор потока, фамилию и имя преподавателя.
+
+SELECT
+  (SELECT stream_id FROM academic_performance WHERE academic_performance.teacher_id =
+     (SELECT id FROM teachers WHERE surname = 'Петрова' AND name = 'Наталья')) AS stream_id,
+  (SELECT surname || name from teachers WHERE surname = 'Петрова' AND name = 'Наталья') AS name
+union
+SELECT
+  (SELECT stream_id FROM academic_performance WHERE performance < 4.8) as stream_id,
+  (SELECT surname || name from teachers WHERE teachers.id =
+     (SELECT teacher_id FROM academic_performance WHERE performance < 4.8)) as name;
+

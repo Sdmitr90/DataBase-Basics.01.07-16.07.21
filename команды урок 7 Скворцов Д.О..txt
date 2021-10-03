@@ -1,0 +1,42 @@
+Создать представление, которое выводит название курса, номер последнего потока, дату начала обучения и среднюю успеваемость курса по всем потокам.
+
+CREATE VIEW Course1_info AS
+select 
+name, 
+MAX(number), 
+started_at,
+avg(performance) as performance
+from training_groups 
+   left join courses
+      on training_groups.course_id = courses.id
+   left join academic_performance
+      on training_groups.id = academic_performance.stream_id
+where training_groups.course_id = 1;
+
+sqlite> select * from Course1_info;
+name         MAX(number)  started_at  performance
+-----------  -----------  ----------  -----------
+Базы данных  210          2020-12-03  4.85
+
+
+Удалить из базы данных всю информацию, которая относится к преподавателю с идентификатором, равным 3. Выполнить все необходимые действия в транзакции.
+
+BEGIN TRANSACTION;
+  DELETE FROM teachers WHERE id = 3;
+  DELETE FROM academic_performance WHERE teacher_id = 3;
+COMMIT;
+
+
+Создать триггер для таблицы academic_performance, который проверяет значение успеваемости на соответствие диапазону чисел между 0.1 и 5 включительно.
+
+CREATE TRIGGER check_performance_format BEFORE INSERT
+ON academic_performance
+BEGIN
+  SELECT CASE 
+  WHEN
+    (NEW.performance NOT LIKE '_._')
+    OR (CAST(SUBSTR(NEW.performance, 1, 3) AS REAL) NOT BETWEEN 0.1 AND 5.0)
+  THEN
+    RAISE(ABORT, 'Wrong format for performance!')
+  END;
+END;

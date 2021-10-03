@@ -1,0 +1,43 @@
+Найти общее количество учеников для каждого курса. В отчет вывести название курса и количество учеников по всем потокам курса. Решить задание с применением оконных функций.
+
+select distinct
+   courses.name,
+   sum(students_amount) over(w_course) as students
+from courses
+   left join training_groups
+     on training_groups.course_id = courses.id
+   window w_course as (partition by training_groups.course_id);
+
+
+Найти среднюю оценку по всем потокам для всех учителей. В отчет вывести идентификатор, фамилию и имя учителя, среднюю оценку по всем проведенным потокам. 
+Учителя, у которых не было потов, также должны попасть в выборку. Решить задание с применением оконных функций.
+
+select
+   teachers.id as teacher_id,
+   teachers.surname as surname,
+   teachers.name as name,
+   avg(performance) over(w_performance) as performance
+from teachers
+   left join academic_performance
+     on academic_performance.teacher_id = teachers.id
+window w_performance as (partition by academic_performance.teacher_id);
+
+
+Построить индексы, необходимые для максимально быстрого выполнения данного запроса.
+
+CREATE UNIQUE INDEX training_groups_number_uq ON training_groups(number);
+
+CREATE INDEX teachers_surname_name_idx ON teachers(surname, name);
+
+
+SELECT
+  surname,
+  name,
+  number,
+  performance
+FROM academic_performance
+  JOIN teachers 
+    ON academic_performance.teacher_id = teachers.id
+  JOIN training_groups
+    ON academic_performance.stream_id = training_groups.id
+WHERE number >= 200; 

@@ -1,0 +1,49 @@
+Показать информацию по потокам. В отчет вывести номер потока, название курса и дату начала занятий.
+
+select number, name, started_at
+from training_groups inner join courses
+on training_groups.course_id = courses.id;
+
+number      name                    started_at
+----------  ----------------------  ----------
+165         Linux. Рабочая станция  2020-08-18
+178         Основы Python           2020-10-02
+203         Базы данных             2020-11-12
+210         Базы данных             2020-12-03
+
+Найти общее количество учеников для каждого курса. В отчет вывести название курса и количество учеников по всем потокам курса.
+
+select
+   courses.name as course_name,
+   sum(training_groups.students_amount)  as students
+from courses
+   left join training_groups
+     on courses.id = training_groups.course_id
+   group by course_id;
+
+course_name  sudents
+-----------  ----------
+Базы данных  76
+Основы Pyth  37
+Linux. Рабо  34
+
+
+Найти среднюю оценку по всем потокам для всех учителей. В отчет вывести идентификатор, фамилию и имя учителя, среднюю оценку по всем проведенным потокам. Учителя, у которых не было потов, также должны попасть в выборку.
+
+select
+   teachers.id as teacher_id,
+   teachers.surname as surname,
+   teachers.name as name,
+   avg(performance) as performance
+from academic_performance
+   left join teachers
+     on academic_performance.teacher_id = teachers.id
+group by teacher_id;
+
+teacher_id  surname     name        performance
+----------  ----------  ----------  -----------
+1           Савельев    Николай     4.85
+2           Петрова     Наталья     4.9
+3           Малышева    Елена       4.7
+
+   

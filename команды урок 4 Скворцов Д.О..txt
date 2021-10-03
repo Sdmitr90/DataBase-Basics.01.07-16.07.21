@@ -1,0 +1,18 @@
+ѕреобразовать дату начала потока к виду год-мес€ц-день.
+sqlite> UPDATE training_groups SET started_at = SUBSTR(started_at, 7, 4) || '-' || SUBSTR(started_at, 4, 2) || '-' || SUBSTR(started_at, 1, 2);
+
+ѕолучить идентификатор и номер потока, который запланирован на самую позднюю дату.
+sqlite> SELECT id, number FROM training_groups ORDER BY started_at DESC LIMIT 1;
+
+ѕоказать уникальные значени€ года дат начала потоков обучени€
+sqlite> select distinct(SUBSTR(started_at, 1, 4)) from training_groups;
+
+Ќайти количество преподавателей в базе данных. ¬ывести искомое значение в столбец с именем total_teachers.
+sqlite> select COUNT(*) AS 'total_teachers' FROM teachers;
+
+ѕоказать даты начала двух последних по времени потоков.
+SELECT started_at FROM training_groups ORDER BY started_at DESC LIMIT 2;
+
+Ќайти среднюю успеваемости учеников по потоку преподавател€ с идентификатором равным 1.
+sqlite> SELECT AVG(performance) FROM academic_performance WHERE teacher_id = 1;
+
